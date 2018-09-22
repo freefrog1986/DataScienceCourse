@@ -1,0 +1,66 @@
+---
+title: 'Basic Inferential Data Analysis'
+author: Bo Liu
+date: March 27, 2017
+output:
+  pdf_document: default
+---
+## Overview
+This report explores the growth of the odontoblast, the cell responsible for tooth growth, of the incisor teeth as a criterion of vitamin C intake of a guinea pig. In this study, 60 guinea pigs each received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid.
+
+### Load the ToothGrowth data and perform some basic exploratory data analyses
+```{r}
+library(ggplot2);library(datasets);library(Hmisc)
+data("ToothGrowth")
+head(ToothGrowth)
+smry <- stat_summary(geom="crossbar", width=0.3, fun.data="mean_cl_boot") 
+meanline <- stat_summary(geom="line",fun="mean_se")
+qplot(dose, len, data=ToothGrowth, colour=supp, xlab="vitamin C Dose(mg/day)", ylab="Tooth Length") + smry + meanline
+```
+
+### Provide a basic summary of the data.
+From this figure, we can see the trend of len when supp and dose change. The len increasing as dose changing from 0.5 to 2 or supp status turn from VC to OJ. 
+We can illustrate our hyperthesis
+
+### Use confidence intervals to compare tooth growth by supp and dose.
+First, calculate mu and sigma.
+```{r}
+mu<-mean(ToothGrowth$len)
+sigma<-var(ToothGrowth$len)
+mu
+sigma
+```
+Second, calculate the confidence intervals, say 95% intervals.
+```{r}
+n <- length(ToothGrowth$len)
+con_int<-mu + c(-1,1)*2*sigma/sqrt(n)
+con_int
+```
+We see that confidence intervals is [3.705594, 33.921073].   
+Third, let's calculate the mean by supp and dose.
+```{r}
+unique(ToothGrowth$supp)
+meansuppvc<-mean(ToothGrowth$len[ToothGrowth$supp=='VC'])
+meansuppoj<-mean(ToothGrowth$len[ToothGrowth$supp=='OJ'])
+meansuppvc
+meansuppoj
+unique(ToothGrowth$dose)
+meandose05<-mean(ToothGrowth$len[ToothGrowth$dose==.5])
+meandose10<-mean(ToothGrowth$len[ToothGrowth$dose==1.0])
+meandose20<-mean(ToothGrowth$len[ToothGrowth$dose==2.0])
+meandose05
+meandose10
+meandose20
+```
+Finally, compare those mean values to confidence intervals.
+```{r}
+con_int-meansuppvc
+con_int-meansuppoj
+con_int-meandose05
+con_int-meandose10
+con_int-meandose20
+```
+If the result values were both negtive or positive, means that the mean value is not in the confidence intervals. Otherwise, the mean value is in the range of confidence intervals.
+
+### Conclusions.
+Since all the mean values are in the confidence intervals, we can conclude that all those results are believable.
